@@ -1,0 +1,83 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: clash-config
+  namespace: default
+  labels:
+    app.kubernetes.io/name: clash
+data:
+  # 配置文件形式（可挂载为文件）
+  config.yaml: |
+    bind-address: "[::]"
+    #socks5
+    socks-port: 1080
+    #http
+    port: 1087
+
+    external-controller: "[::]:9090"
+
+    ipv6: true
+    allow-lan: true
+
+    mode: rule
+    log-level: info
+
+    secret: ""
+
+    proxies:
+      - name: "ss-node-ipv6-hotspot"
+        type: ss
+        interface-name: "wlxe84e06fa5b48"
+        server: "2600:1f16:4b1:aa00:f182:a212:c87a:4194"
+        port: 4800
+        cipher: "aes-256-gcm"
+        password: "Test523523"
+        timeout: 30
+      - name: "ss-node-ipv6-wifi"
+        type: ss
+        interface-name: "wlp2s0"
+        server: "2600:1f16:4b1:aa00:f182:a212:c87a:4194"
+        port: 4800
+        cipher: "aes-256-gcm"
+        password: "Test523523"
+        timeout: 30
+      - name: "ss-node-ipv4-hotspot"
+        type: ss
+        interface-name: "wlxe84e06fa5b48"
+        server: "13.59.212.131"
+        port: 4800
+        cipher: "aes-256-gcm"
+        password: "Test523523"
+        timeout: 30
+      - name: "ss-node-ipv4-wifi"
+        type: ss
+        interface-name: "wlp2s0"
+        server: "13.59.212.131"
+        port: 4800
+        cipher: "aes-256-gcm"
+        password: "Test523523"
+        timeout: 30
+
+    proxy-groups:
+      - name: "ipv6-proxy"
+        type: fallback
+        proxies:
+          - ss-node-ipv6-hotspot
+          - ss-node-ipv6-wifi
+        url: "http://ipv6.google.com"
+        interval: 30
+        tolerance: 50
+      - name: "ipv4-proxy"
+        type: fallback
+        proxies:
+          - ss-node-ipv4-hotspot
+          - ss-node-ipv4-wifi
+        url: "http://ipv4.google.com"
+        interval: 30
+        tolerance: 50
+
+    rules:
+      - GEOIP,CN,DIRECT
+      - IP-CIDR,::/0,ipv6-proxy
+      - IP-CIDR,0.0.0.0/0,ipv4-proxy
+      - MATCH,ipv4-proxy

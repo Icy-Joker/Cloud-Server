@@ -1,0 +1,15 @@
+resources:
+# - namespace.yaml
+# - storageclass.yaml
+# - pv.yaml
+# - pvc.yaml
+  - configmap.yaml
+# - secret.yaml
+  - role.yaml
+  - rolebinding.yaml
+  - clusterrole.yaml
+  - clusterrolebinding.yaml
+  - serviceaccount.yaml
+  - deployment.yaml
+  - service.yaml
+# - ingress.yaml
