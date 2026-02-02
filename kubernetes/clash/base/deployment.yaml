@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: clash
+  namespace: default
+spec:
+  replicas: 1
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app: clash
+  template:
+    metadata:
+      labels:
+        app: clash
+    spec:
+      hostNetwork: true
+      tolerations:
+        - key: "node-role.kubernetes.io/control-plane"
+          operator: "Exists"
+          effect: "NoSchedule"
+      containers:
+        - name: clash
+          image: dreamacro/clash:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: "socks"
+              containerPort: 1080
+            - name: "http"
+              containerPort: 1087
+            - name: "api"
+              containerPort: 9090
+          volumeMounts:
+            - name: clash-config
+              mountPath: /root/.config/clash/config.yaml
+              subPath: config.yaml
+              readOnly: true
+          resources:
+            requests:
+              cpu: "200m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+      volumes:
+        - name: clash-config
+          configMap:
+            name: clash-config
