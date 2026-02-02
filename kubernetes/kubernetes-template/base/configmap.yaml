@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kubernetes-template-config
+  namespace: default
+  labels:
+    app.kubernetes.io/name: kubernetes-template
+data:
+# config.yaml: |
