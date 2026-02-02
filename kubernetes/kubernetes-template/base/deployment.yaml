@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  generation: 1
+  labels:
+    app: kubernetes-template
+  name: kubernetes-template
+  namespace: default
+spec:
+  progressDeadlineSeconds: 60
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: kubernetes-template
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: kubernetes-template
+    spec:
+      tolerations:
+        - key: "node-role.kubernetes.io/control-plane"
+          operator: "Exists"
+          effect: "NoSchedule"
+      containers:
+      - name: ubuntu
+        image: ubuntu:latest
+        imagePullPolicy: IfNotPresent
+        #command: ["tail", "-f", "/dev/null"]
+        resources: {}
+        volumeMounts:
+        - name: kubernetes-template-data
+          mountPath: /srv/kubernetes-template/data
+          subPath: data
+        - name: config-volume
+          mountPath: /etc/kubernetes-template
+          #subPath: app.properties
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      volumes:
+      - name: config-volume
+        configMap:
+          name: kubernetes-template-config
+      - name: kubernetes-template-data
+        persistentVolumeClaim:
+          claimName: kubernetes-template
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      terminationGracePeriodSeconds: 30
