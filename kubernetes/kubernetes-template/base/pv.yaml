@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: kubernetes-template
+  labels:
+    app.kubernetes.io/name: kubernetes-template
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: kubernetes-template-storage
+  volumeMode: Filesystem
+  local:
+    path: /srv/kubernetes-template
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+                - cloud-server

@@ -1,0 +1,12 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: kubernetes-template-cluster-role-binding
+subjects:
+  - kind: ServiceAccount
+    name: kubernetes-template
+    namespace: default
+roleRef:
+  kind: ClusterRole
+  name: kubernetes-template-cluster-role
+  apiGroup: rbac.authorization.k8s.io
