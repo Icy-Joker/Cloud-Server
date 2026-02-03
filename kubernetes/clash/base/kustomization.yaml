@@ -1,4 +1,14 @@
 resources:
+  #- namespace.yaml
+  #- storageclass.yaml
+  #- pv.yaml
+  #- pvc.yaml
+  - configmap.yaml
+  #- secret.yaml
+  #- role.yaml
+  #- clusterrole.yam
+  #- rolebinding.yaml
+  #- serviceaccount.yaml
   - deployment.yaml
   - service.yaml
-  - configmap.yaml
+  #- ingress.yaml

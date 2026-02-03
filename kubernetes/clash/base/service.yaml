@@ -3,20 +3,22 @@ kind: Service
 metadata:
   name: clash
   namespace: default
+  labels:
+    app: clash
 spec:
   type: NodePort
   selector:
     app: clash
   ports:
-    - name: socks
-      port: 1080
-      targetPort: 1080
-      nodePort: 1080
-    - name: http
-      port: 1087
-      targetPort: 1087
-      nodePort: 1087
-    - name: api
-      port: 9090
-      targetPort: 9090
-      nodePort: 9090
+  - name: socks
+    port: 1080
+    targetPort: 1080
+    nodePort: 1080
+  - name: http
+    port: 1087
+    targetPort: 1087
+    nodePort: 1087
+  #- name: api
+    #port: 9090
+    #targetPort: 9090
+    #nodePort: 9090

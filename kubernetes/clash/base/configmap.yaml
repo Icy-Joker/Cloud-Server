@@ -3,7 +3,10 @@ kind: ConfigMap
 metadata:
   name: clash-config
   namespace: default
+  labels:
+    app.kubernetes.io/name: clash
 data:
+  # 配置文件形式（可挂载为文件）
   config.yaml: |
     bind-address: "[::]"
     #socks5
