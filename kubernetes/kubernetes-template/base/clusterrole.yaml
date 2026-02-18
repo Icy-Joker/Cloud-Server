@@ -3,45 +3,9 @@ kind: ClusterRole
 metadata:
   name: kubernetes-template-cluster-role
 rules:
-- apiGroups: 
-  - ""
-  resources: 
-  - "namespaces"
-  verbs: 
-  - "get"
-  - "create"
-  - "list"
-- apiGroups: 
-  - "management.cattle.io"
-  resources: 
-  - "clusters"
-  verbs: 
-  - "get"
-  - "list"
-  - "watch"
-- apiGroups: 
-  - "management.cattle.io"
-  - "management.caty6ytle.io"
-  resources: 
-  - "nodetemplates"
-  verbs: 
-  - "get"
-  - "list"
-  - "watch"
-- apiGroups: 
-  - "management.cattle.io"
-  - "management.caty6ytle.io"
-  resources: 
-  - "clustertemplates"
-  verbs: 
-  - "get"
-  - "list"
-  - "watch"
-- apiGroups: 
-  - "management.cattle.io"
-  resources: 
-  - "features"
-  verbs: 
-  - "get"
-  - "list"
-  - "watch"
+# - apiGroups:
+#     - ""
+#   resources:
+#     - ""
+#   verbs:
+#     - ""

@@ -6,13 +6,4 @@ metadata:
   labels:
     app.kubernetes.io/name: kubernetes-template
 data:
-  # 配置文件形式（可挂载为文件）
-  app.properties: |
-    APP_ENV=production
-    LOG_LEVEL=info
-    MAX_CONNECTIONS=100
-
-  # 单条键值对（可作为环境变量注入）
-  DATABASE_HOST: db.example.com
-  DATABASE_PORT: "5432"
-  FEATURE_FLAG_NEWUI: "true"
+# config.yaml: |
