@@ -10,15 +10,11 @@ spec:
   selector:
     app: clash
   ports:
-  - name: socks
+  - name: socks-proxy
     port: 1080
     targetPort: 1080
     nodePort: 1080
-  - name: http
+  - name: http-proxy
     port: 1087
     targetPort: 1087
     nodePort: 1087
-  #- name: api
-    #port: 9090
-    #targetPort: 9090
-    #nodePort: 9090

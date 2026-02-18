@@ -28,7 +28,7 @@ spec:
       hostNetwork: true
       containers:
       - name: clash
-        image: dreamacro/clash:latest
+        image: 127.0.0.1:5000/dreamacro/clash:latest
         imagePullPolicy: IfNotPresent
 
         #command: ["/clash", "-d", "/etc/clash", "-f", "/etc/clash/config.yaml"]
