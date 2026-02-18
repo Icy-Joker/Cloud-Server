@@ -3,9 +3,9 @@ kind: ClusterRoleBinding
 metadata:
   name: clash-cluster-role-binding
 subjects:
-- kind: ServiceAccount
-  name: clash
-  namespace: default
+  - kind: ServiceAccount
+    name: clash
+    namespace: default
 roleRef:
   kind: ClusterRole
   name: clash-cluster-role

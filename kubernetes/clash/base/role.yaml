@@ -3,10 +3,10 @@ kind: Role
 metadata:
   name: clash-role
   namespace: default
-#rules:
-#- apiGroups:
-#  - ""
-#  resources:
-#  - ""
-#  verbs:
-#  - ""
+rules:
+# - apiGroups:
+#     - ""
+#   resources:
+#     - ""
+#   verbs:
+#     - ""

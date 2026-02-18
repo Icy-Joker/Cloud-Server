@@ -20,47 +20,48 @@ spec:
       labels:
         app: clash
     spec:
+      serviceAccountName: clash
       tolerations:
-      - key: "node-role.kubernetes.io/control-plane"
-        operator: "Exists"
-        effect: "NoSchedule"
+        - key: "node-role.kubernetes.io/control-plane"
+          operator: "Exists"
+          effect: "NoSchedule"
 
       hostNetwork: true
       containers:
-      - name: clash
-        image: 127.0.0.1:5000/dreamacro/clash:latest
-        imagePullPolicy: IfNotPresent
+        - name: clash
+          image: 127.0.0.1:5000/dreamacro/clash:latest
+          imagePullPolicy: IfNotPresent
 
-        #command: ["/clash", "-d", "/etc/clash", "-f", "/etc/clash/config.yaml"]
-        
-        resources:
-          requests:
-            cpu: "200m"
-            memory: "256Mi"
-          limits:
-            cpu: "500m"
-            memory: "512Mi"
-        ports:
-        - name: "socks"
-          containerPort: 1080
-        - name: "http"
-          containerPort: 1087
-        volumeMounts:
-        - name: clash-config
-          mountPath: /root/.config/clash/config.yaml
-          subPath: config.yaml
-          readOnly: true
-        terminationMessagePath: /dev/termination-log
-        terminationMessagePolicy: File
+          #command: ["/clash", "-d", "/etc/clash", "-f", "/etc/clash/config.yaml"]
+          
+          resources:
+            requests:
+              cpu: "200m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          ports:
+            - name: "socks"
+              containerPort: 1080
+            - name: "http"
+              containerPort: 1087
+          volumeMounts:
+            - name: clash-config
+              mountPath: /root/.config/clash/config.yaml
+              subPath: config.yaml
+              readOnly: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
       volumes:
-      - name: clash-config
-        configMap:
-          name: clash-config
+        - name: clash-config
+          configMap:
+            name: clash-config
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
-      #securityContext:
-        #runAsUser: 1000
-        #runAsGroup: 1000
-        #fsGroup: 1000
+#     securityContext:
+#       runAsUser: 1000
+#       runAsGroup: 1000
+#       fsGroup: 1000
       terminationGracePeriodSeconds: 30
