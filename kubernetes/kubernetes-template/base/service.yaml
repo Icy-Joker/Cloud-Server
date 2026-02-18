@@ -10,7 +10,11 @@ spec:
   selector:
     app: kubernetes-template
   ports:
-    - name: http
-      protocol: TCP
-      port: 8080
-      targetPort: 8080
+  - name: http
+    port: 80
+    targetPort: 80
+    nodePort: 80
+  - name: https
+    port: 443
+    targetPort: 443
+    nodePort: 443
