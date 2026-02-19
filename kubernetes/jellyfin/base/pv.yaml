@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: jellyfin
+  labels:
+    app.kubernetes.io/name: jellyfin
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: jellyfin-storage
+  volumeMode: Filesystem
+  local:
+    path: /srv/jellyfin
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+                - cloud-server

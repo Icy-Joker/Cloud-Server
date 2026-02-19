@@ -1,0 +1,87 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  generation: 1
+  labels:
+    app: jellyfin
+  name: jellyfin
+  namespace: default
+spec:
+  progressDeadlineSeconds: 60
+  replicas: 1
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app: jellyfin
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: jellyfin
+    spec:
+      serviceAccountName: jellyfin
+#     hostNetwork: true
+      terminationGracePeriodSeconds: 30
+
+      tolerations:
+        - key: node-role.kubernetes.io/control-plane
+          operator: Exists
+          effect: NoSchedule
+
+      volumes:
+#       - name: jellyfin-config
+#         configMap:
+#           name: jellyfin-config
+        - name: jellyfin-pvc
+          persistentVolumeClaim:
+            claimName: jellyfin-pvc
+
+      containers:
+        - name: jellyfin
+          image: 127.0.0.1:5000/jellyfin/jellyfin:latest
+          imagePullPolicy: IfNotPresent
+
+#         command: [tail, -f, /dev/null]
+
+          ports:
+            - name: http
+              containerPort: 8096
+
+          volumeMounts:
+#           - name: jellyfin-config
+#             mountPath: /root/.config/jellyfin/config.yaml
+#             subPath: config.yaml
+#             readOnly: true
+            - name: jellyfin-pvc
+              mountPath: /config
+              subPath: config
+#             readOnly: true
+            - name: jellyfin-pvc
+              mountPath: /cache
+              subPath: cache
+#             readOnly: true
+            - name: jellyfin-pvc
+              mountPath: /media
+              subPath: media
+#             readOnly: true
+          
+          resources:
+            requests:
+              cpu: 500m
+              memory: 512Mi
+            limits:
+              cpu: 4
+              memory: 1Gi
+
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+
+#     securityContext:
+#       runAsUser: 1000
+#       runAsGroup: 1000
+#       fsGroup: 1000
