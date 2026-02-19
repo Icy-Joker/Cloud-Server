@@ -25,9 +25,9 @@ spec:
       terminationGracePeriodSeconds: 30
 
       tolerations:
-        - key: "node-role.kubernetes.io/control-plane"
-          operator: "Exists"
-          effect: "NoSchedule"
+        - key: node-role.kubernetes.io/control-plane
+          operator: Exists
+          effect: NoSchedule
 
       volumes:
 #       - name: kubernetes-template-config
@@ -42,10 +42,10 @@ spec:
           image: 127.0.0.1:5000/library/ubuntu:latest
           imagePullPolicy: IfNotPresent
 
-          command: ["tail", "-f", "/dev/null"]
+          command: [tail, -f, /dev/null]
 
           ports:
-            - name: "http"
+            - name: http
               containerPort: 80
 
           volumeMounts:
@@ -54,17 +54,17 @@ spec:
 #             subPath: config.yaml
 #             readOnly: true
             - name: kubernetes-template-pvc
-              mountPath: "/opt/kubernetes-template"
-#             subPath: ""
+              mountPath: /opt/kubernetes-template
+#             subPath: 
 #             readOnly: true
           
           resources:
             requests:
-              cpu: "200m"
-              memory: "256Mi"
+              cpu: 200m
+              memory: 256Mi
             limits:
-              cpu: "500m"
-              memory: "512Mi"
+              cpu: 500m
+              memory: 512Mi
 
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
