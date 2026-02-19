@@ -42,7 +42,7 @@ spec:
           image: 127.0.0.1:5000/library/ubuntu:latest
           imagePullPolicy: IfNotPresent
 
-          command: [tail, -f, /dev/null]
+          command: ["tail", "-f", "/dev/null"]
 
           ports:
             - name: http
