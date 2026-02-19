@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: registry-config
+  namespace: default
+  labels:
+    app.kubernetes.io/name: registry
+data:
+  config.yml: |
+    version: 0.1
+    log:
+      level: info
+
+    storage:
+      filesystem:
+        rootdirectory: /var/lib/registry
+
+    http:
+      addr: :5000
+
+    # 禁用 tracing
+    tracing:
+      disable: true
