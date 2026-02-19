@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: kubernetes-template-home
+  name: kubernetes-template-pvc
   namespace: default
   labels:
     app.kubernetes.io/name: kubernetes-template
