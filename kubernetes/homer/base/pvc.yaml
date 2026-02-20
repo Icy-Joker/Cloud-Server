@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: homer-pvc
+  namespace: default
+  labels:
+    app.kubernetes.io/name: homer
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: homer-storage
+  volumeMode: Filesystem
