@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: homer-config
+  namespace: default
+  labels:
+    app.kubernetes.io/name: homer
+data:
+  config.yml: |
+    title: "云服务门户"
+    subtitle: "Homer Dashboard"
+
+    links: []
+    header: false
+    bighead: false
+    footer: "Powered by Homer"
+
+    services:
+      - name: "开发环境"
+        items:
+          - name: "GitLab"
+            url: "http://cloud-server.tail1e1889.ts.net:28080"
+
+          - name: "Zentao"
+            url: "http://cloud-server.tail1e1889.ts.net:30808"
+
+          - name: "portainer-ce"
+            url: "https://cloud-server.tail1e1889.ts.net:9443"
+
+      - name: "家庭娱乐"
+        items:
+          - name: "Jellyfin"
+            url: "http://cloud-server.tail1e1889.ts.net:8096"
