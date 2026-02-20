@@ -1,0 +1,83 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  generation: 1
+  labels:
+    app: zentao
+  name: zentao
+  namespace: default
+spec:
+  progressDeadlineSeconds: 60
+  replicas: 1
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app: zentao
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: zentao
+    spec:
+      serviceAccountName: zentao
+#     hostNetwork: true
+      terminationGracePeriodSeconds: 30
+
+      tolerations:
+        - key: node-role.kubernetes.io/control-plane
+          operator: Exists
+          effect: NoSchedule
+
+      volumes:
+#       - name: zentao-config
+#         configMap:
+#           name: zentao-config
+        - name: zentao-pvc
+          persistentVolumeClaim:
+            claimName: zentao-pvc
+
+      containers:
+        - name: zentao
+          image: 127.0.0.1:5000/easysoft/zentao:latest
+          imagePullPolicy: IfNotPresent
+
+          env:
+            - name: MYSQL_INTERNAL
+              value: "true"
+
+#         command: ["tail", "-f", "/dev/null"]
+
+          ports:
+            - name: http
+              containerPort: 80
+
+          volumeMounts:
+#           - name: zentao-config
+#             mountPath: /root/.config/zentao/config.yaml
+#             subPath: config.yaml
+#             readOnly: true
+            - name: zentao-pvc
+              mountPath: /data
+              subPath: data
+#             readOnly: true
+          
+          resources:
+            requests:
+              cpu: 500m
+              memory: 512Mi
+            limits:
+              cpu: 4
+              memory: 1Gi
+
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+
+#     securityContext:
+#       runAsUser: 1000
+#       runAsGroup: 1000
+#       fsGroup: 1000
