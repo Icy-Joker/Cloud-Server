@@ -1,0 +1,100 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  generation: 1
+  labels:
+    app: gitlab-ce
+  name: gitlab-ce
+  namespace: default
+spec:
+  progressDeadlineSeconds: 60
+  replicas: 1
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app: gitlab-ce
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: gitlab-ce
+    spec:
+      serviceAccountName: gitlab-ce
+#     hostNetwork: true
+      terminationGracePeriodSeconds: 30
+
+      tolerations:
+        - key: node-role.kubernetes.io/control-plane
+          operator: Exists
+          effect: NoSchedule
+
+      volumes:
+#       - name: gitlab-ce-config
+#         configMap:
+#           name: gitlab-ce-config
+        - name: gitlab-ce-pvc
+          persistentVolumeClaim:
+            claimName: gitlab-ce-pvc
+
+      containers:
+        - name: gitlab-ce
+          image: 127.0.0.1:5000/gitlab/gitlab-ce:latest
+          imagePullPolicy: IfNotPresent
+
+          env:
+            - name: GITLAB_OMNIBUS_CONFIG
+              value: |
+                external_url 'http://192.168.0.104:28080'
+                nginx['listen_port'] = 28080
+                nginx['listen_https'] = false
+                gitlab_rails['gitlab_shell_ssh_port'] = 22222
+                prometheus['enable'] = false
+
+#         command: ["tail", "-f", "/dev/null"]
+
+          ports:
+            - name: http
+              containerPort: 28080
+            - name: https
+              containerPort: 443
+            - name: ssh
+              containerPort: 22
+
+          volumeMounts:
+#           - name: gitlab-ce-config
+#             mountPath: /root/.config/gitlab-ce/config.yaml
+#             subPath: config.yaml
+#             readOnly: true
+            - name: gitlab-ce-pvc
+              mountPath: /etc/gitlab
+              subPath: config
+#             readOnly: true
+            - name: gitlab-ce-pvc
+              mountPath: /var/log/gitlab
+              subPath: logs
+#             readOnly: true
+            - name: gitlab-ce-pvc
+              mountPath: /var/opt/gitlab
+              subPath: data
+#             readOnly: true
+          
+#         resources:
+#           requests:
+#             cpu: 500m
+#             memory: 512Mi
+#           limits:
+#             cpu: 4
+#             memory: 1Gi
+
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+
+#     securityContext:
+#       runAsUser: 1000
+#       runAsGroup: 1000
+#       fsGroup: 1000
