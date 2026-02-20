@@ -1,0 +1,86 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  generation: 1
+  labels:
+    app: mysql
+  name: mysql
+  namespace: default
+spec:
+  progressDeadlineSeconds: 60
+  replicas: 1
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app: mysql
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      serviceAccountName: mysql
+#     hostNetwork: true
+      terminationGracePeriodSeconds: 30
+
+      tolerations:
+        - key: node-role.kubernetes.io/control-plane
+          operator: Exists
+          effect: NoSchedule
+
+      volumes:
+#       - name: mysql-config
+#         configMap:
+#           name: mysql-config
+        - name: mysql-pvc
+          persistentVolumeClaim:
+            claimName: mysql-pvc
+
+      containers:
+        - name: mysql
+          image: 127.0.0.1:5000/library/mysql:lts
+          imagePullPolicy: IfNotPresent
+
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: mysql-root-password
+
+#         command: ["tail", "-f", "/dev/null"]
+
+          ports:
+            - name: mysql
+              containerPort: 3306
+
+          volumeMounts:
+#           - name: mysql-config
+#             mountPath: /root/.config/mysql/config.yaml
+#             subPath: config.yaml
+#             readOnly: true
+            - name: mysql-pvc
+              mountPath: /var/lib/mysql
+#             subPath: 
+#             readOnly: true
+          
+          resources:
+            requests:
+              cpu: 500m
+              memory: 512Mi
+#           limits:
+#             cpu: 4
+#             memory: 1Gi
+
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+
+#     securityContext:
+#       runAsUser: 1000
+#       runAsGroup: 1000
+#       fsGroup: 1000
