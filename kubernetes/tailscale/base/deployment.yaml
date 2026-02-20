@@ -1,0 +1,89 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  generation: 1
+  labels:
+    app: tailscale
+  name: tailscale
+  namespace: default
+spec:
+  progressDeadlineSeconds: 60
+  replicas: 1
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app: tailscale
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: tailscale
+    spec:
+      serviceAccountName: tailscale
+      hostNetwork: true
+      terminationGracePeriodSeconds: 30
+
+      tolerations:
+        - key: node-role.kubernetes.io/control-plane
+          operator: Exists
+          effect: NoSchedule
+
+      volumes:
+        - name: tailscale-config
+          configMap:
+            name: tailscale-config
+#       - name: tailscale-pvc
+#         persistentVolumeClaim:
+#           claimName: tailscale-pvc
+
+      containers:
+        - name: tailscale
+          image: 127.0.0.1:5000/tailscale/tailscale:latest
+          imagePullPolicy: IfNotPresent
+
+#         command: ["tail", "-f", "/dev/null"]
+
+          securityContext:
+            capabilities:
+              add:
+                - NET_ADMIN
+                - NET_RAW
+
+#         ports:
+#           - name: http
+#             containerPort: 80
+
+          env:
+            - name: TS_CONFIG_FILE
+              value: /etc/tailscale/tailscaled.conf
+
+          volumeMounts:
+            - name: tailscale-config
+              mountPath: /etc/tailscaled/tailscaled.conf
+              subPath: tailscaled.conf
+              readOnly: true
+#           - name: tailscale-pvc
+#             mountPath: /opt/tailscale
+#             subPath: 
+#             readOnly: true
+          
+          resources:
+            requests:
+              cpu: 500m
+              memory: 512Mi
+            limits:
+              cpu: 4
+              memory: 1Gi
+
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+
+      dnsPolicy: ClusterFirstWithHostNet
+      restartPolicy: Always
+      schedulerName: default-scheduler
+
+#     securityContext:
+#       runAsUser: 1000
+#       runAsGroup: 1000
+#       fsGroup: 1000
