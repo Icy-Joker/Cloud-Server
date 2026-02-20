@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: zentao-config
+  namespace: default
+  labels:
+    app.kubernetes.io/name: zentao
+data:
+# config.yaml: |
