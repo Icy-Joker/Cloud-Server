@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tailscale-config
+  namespace: default
+  labels:
+    app.kubernetes.io/name: tailscale
+data:
+  tailscaled.conf: |
+    {
+      "server": "https://controlplane.tailscale.com",
+      "hostname": "k8s-subnet-router",
+      "acceptDNS": true,
+      "acceptRoutes": false,
+      "advertiseRoutes": [
+        "10.96.0.0/12",
+        "10.244.0.0/16",
+        "192.168.0.0/24"
+      ],
+      "snat": true
+    }
