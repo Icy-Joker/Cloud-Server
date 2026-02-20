@@ -1,0 +1,45 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gitlab-runner-config
+  namespace: default
+  labels:
+    app.kubernetes.io/name: gitlab-runner
+data:
+  config.toml: |
+    concurrent = 4
+
+    check_interval = 5
+    [[runners]]
+      name = "k8s-runner"
+      url = "http://192.168.0.104:28080"
+      token = "glrt-o64ve5OUMcOLY4UpU05qI286MQpwOjEKdDozCnU6Mg8.01.170mzf3fu"
+      executor = "kubernetes"
+      builds_dir = "/home/gitlab"
+      [runners.kubernetes]
+        namespace = "default"
+        #namespace_overwrite_allowed = "ci-.*"
+        #bearer_token_overwrite_allowed = true
+
+        image = "almalinux:latest"
+        pull_policy = "if-not-present"
+        allowed_pull_policies = ["always", "if-not-present", "never"]
+        #helper_image = "gitlab/gitlab-runner-helper:x86_64-v18.8.0"
+        helper_image_pull_policy = "if-not-present"
+        privileged = true
+
+        #cpu_limit = "1"
+        #memory_limit = "1Gi"
+        #service_cpu_limit = "1"
+        #service_memory_limit = "1Gi"
+        #helper_cpu_limit = "500m"
+        #helper_memory_limit = "100Mi"
+        #poll_interval = 5
+        #poll_timeout = 3600
+        #dns_policy = "cluster-first"
+        #logs_base_dir = "/tmp"
+        #scripts_base_dir = "/tmp"
+        #[runners.kubernetes.node_selector]
+        #  gitlab = "true"
+        [runners.kubernetes.node_tolerations]
+          "node-role.kubernetes.io/control-plane" = "NoSchedule"
