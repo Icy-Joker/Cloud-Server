@@ -1,0 +1,88 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  generation: 1
+  labels:
+    app: homer
+  name: homer
+  namespace: default
+spec:
+  progressDeadlineSeconds: 60
+  replicas: 1
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app: homer
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: homer
+    spec:
+      serviceAccountName: homer
+#     hostNetwork: true
+      terminationGracePeriodSeconds: 30
+
+      tolerations:
+        - key: node-role.kubernetes.io/control-plane
+          operator: Exists
+          effect: NoSchedule
+
+      volumes:
+        - name: homer-config
+          configMap:
+            name: homer-config
+#       - name: homer-pvc
+#         persistentVolumeClaim:
+#           claimName: homer-pvc
+
+      containers:
+        - name: homer
+          image: 127.0.0.1:5000/b4bz/homer:latest
+          imagePullPolicy: IfNotPresent
+
+#         command: ["tail", "-f", "/dev/null"]
+
+          env:
+            - name: NO_PROXY
+              value: "localhost,127.0.0.1,::1,192.168.0.0/16,10.0.0.0/8,172.16.0.0/12,169.254.169.254,*.svc,*.cluster.local"
+#           - name: ALL_PROXY
+#             value: "http://192.168.0.104:1080"
+            - name: HTTP_PROXY
+              value: "http://192.168.0.104:1087"
+            - name: HTTPS_PROXY
+              value: "http://192.168.0.104:1087"
+          ports:
+            - name: http
+              containerPort: 8080
+
+          volumeMounts:
+            - name: homer-config
+              mountPath: /www/assets/config.yml
+              subPath: config.yml
+#             readOnly: true
+#           - name: homer-pvc
+#             mountPath: /opt/homer
+#             subPath: 
+#             readOnly: true
+          
+          resources:
+            requests:
+              cpu: 500m
+              memory: 512Mi
+            limits:
+              cpu: 4
+              memory: 1Gi
+
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+
+#     securityContext:
+#       runAsUser: 1000
+#       runAsGroup: 1000
+#       fsGroup: 1000
