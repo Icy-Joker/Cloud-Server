@@ -1,0 +1,85 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  generation: 1
+  labels:
+    app: nexus
+  name: nexus
+  namespace: default
+spec:
+  progressDeadlineSeconds: 60
+  replicas: 1
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app: nexus
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: nexus
+    spec:
+      serviceAccountName: nexus
+      terminationGracePeriodSeconds: 30
+
+      tolerations:
+        - key: node-role.kubernetes.io/control-plane
+          operator: Exists
+          effect: NoSchedule
+
+      volumes:
+        - name: nexus-pvc
+          hostPath:
+        #   path: /tmp/nexus-data
+        #   type: DirectoryOrCreate
+          persistentVolumeClaim:
+            claimName: nexus-pvc
+
+      initContainers:
+        - name: nexus-init
+          image: 127.0.0.1:5000/library/busybox:latest
+          imagePullPolicy: IfNotPresent
+
+          command:
+            - sh
+            - -c
+            - |
+              chown 200:200 /nexus-data
+
+          volumeMounts:
+            - name: nexus-pvc
+              mountPath: /nexus-data
+
+      containers:
+        - name: nexus
+          image: 127.0.0.1:5000/sonatype/nexus3:3.76.0
+          imagePullPolicy: IfNotPresent
+
+          ports:
+            - name: api
+              containerPort: 8081
+            - name: oci
+              containerPort: 5000
+
+          volumeMounts:
+            - name: nexus-pvc
+              mountPath: /nexus-data
+          
+          resources:
+            requests:
+              cpu: 500m
+              memory: 512Mi
+            limits:
+              cpu: 4
+              memory: 8Gi
+
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+
+      securityContext:
+        fsGroup: 200
