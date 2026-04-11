@@ -1,8 +1,7 @@
 apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
+kind: ClusterRole
 metadata:
-  name: clash-role
-  namespace: default
+  name: mihomo-cluster-role
 rules:
 # - apiGroups:
 #     - ""

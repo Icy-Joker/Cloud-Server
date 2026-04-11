@@ -1,0 +1,79 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mihomo-config
+  namespace: default
+  labels:
+    app.kubernetes.io/name: mihomo
+data:
+  # 配置文件形式（可挂载为文件）
+  config.yaml: |
+    # ==================== 基础设置 ====================
+    #mixed-port: 7890              # 混合端口（HTTP+SOCKS5）
+    redir-port: 7892              # 透明代理端口（Linux Redir）
+    socks-port: 1080              # SOCKS5 代理端口
+    port: 1087                    # HTTP 代理端口
+    ipv6: true
+    allow-lan: true              # 是否允许局域网连接（true/false）
+    bind-address: '*'             # 监听地址
+    mode: rule                    # 运行模式：rule(规则)/global(全局)/direct(直连)
+    log-level: info               # 日志级别：debug/info/warning/error/silent
+    external-controller: "localhost:9090" # 外部控制 RESTful API
+    secret: ''                    # 外部控制 API 密钥（建议设置）
+    # ==================== 代理服务器列表 ====================
+    proxies:
+      - name: "ss-node-ipv6-wifi"
+        type: ss
+        udp: true
+        server: "2600:1f16:4b1:aa00:31f3:22be:ea00:4602"
+        port: 4800
+        cipher: "aes-256-gcm"
+        password: "Test523523"
+        timeout: 30
+      - name: "ss-node-ipv4-wifi"
+        type: ss
+        udp: true
+        server: "13.59.212.131"
+        port: 4800
+        cipher: "aes-256-gcm"
+        password: "Test523523"
+        timeout: 30
+    # ==================== 代理组策略 ====================
+    proxy-groups:
+      - name: "ipv6-proxy"
+        type: fallback
+        proxies:
+          - ss-node-ipv6-wifi
+        url: "http://ipv6.google.com"
+        interval: 300
+        timeout: 5000
+        tolerance: 5000
+      - name: "ipv4-proxy"
+        type: fallback
+        proxies:
+          - ss-node-ipv4-wifi
+        url: "http://ipv4.google.com"
+        interval: 300
+        timeout: 5000
+        tolerance: 5000
+    # ==================== 规则集（核心分流逻辑） ====================
+    # 规则匹配顺序：从上到下，匹配即停止
+    rules:
+      - GEOSITE,CN,DIRECT
+      - GEOSITE,GEOLOCATION-!CN,ipv6-proxy
+      - GEOIP,CN,DIRECT
+      - MATCH,ipv6-proxy
+    # ==================== 性能优化设置 ====================
+    profile:
+      store-selected: true        # 记住选择的节点
+      store-fake-ip: true         # 记住 fake-ip 映射
+    # ======================================================
+    geo-auto-update: true
+    geo-update-interval: 24
+    geodata-mode: true
+    geox-url:
+      geoip: https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geoip-lite.dat
+      geosite: https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geosite.dat
+      mmdb: https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geoip.metadb
+      asn: https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/GeoLite2-ASN.mmdb
+

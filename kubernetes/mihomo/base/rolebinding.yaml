@@ -1,12 +1,13 @@
 apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
+kind: RoleBinding
 metadata:
-  name: clash-cluster-role-binding
+  name: mihomo-role-binding
+  namespace: default
 subjects:
   - kind: ServiceAccount
-    name: clash
+    name: mihomo
     namespace: default
 roleRef:
-  kind: ClusterRole
-  name: clash-cluster-role
+  kind: Role
+  name: mihomo-role
   apiGroup: rbac.authorization.k8s.io

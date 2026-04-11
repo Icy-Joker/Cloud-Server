@@ -3,8 +3,8 @@ kind: Deployment
 metadata:
   generation: 1
   labels:
-    app: clash
-  name: clash
+    app: mihomo
+  name: mihomo
   namespace: default
 spec:
   progressDeadlineSeconds: 60
@@ -12,15 +12,15 @@ spec:
   revisionHistoryLimit: 2
   selector:
     matchLabels:
-      app: clash
+      app: mihomo
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        app: clash
+        app: mihomo
     spec:
-      serviceAccountName: clash
+      serviceAccountName: mihomo
       tolerations:
         - key: "node-role.kubernetes.io/control-plane"
           operator: "Exists"
@@ -28,11 +28,11 @@ spec:
 
       hostNetwork: true
       containers:
-        - name: clash
-          image: 127.0.0.1:5000/dreamacro/clash:latest
+        - name: mihomo
+          image: 127.0.0.1:5000/metacubex/mihomo:latest
           imagePullPolicy: IfNotPresent
 
-          #command: ["/clash", "-d", "/etc/clash", "-f", "/etc/clash/config.yaml"]
+          #command: ["/mihomo", "-d", "/etc/mihomo", "-f", "/etc/mihomo/config.yaml"]
           
           resources:
             requests:
@@ -47,16 +47,16 @@ spec:
             - name: "http"
               containerPort: 1087
           volumeMounts:
-            - name: clash-config
-              mountPath: /root/.config/clash/config.yaml
+            - name: mihomo-config
+              mountPath: /root/.config/mihomo/config.yaml
               subPath: config.yaml
               readOnly: true
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
       volumes:
-        - name: clash-config
+        - name: mihomo-config
           configMap:
-            name: clash-config
+            name: mihomo-config
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
