@@ -1,0 +1,21 @@
+services:
+  gitlab-runner:
+    image: 192.168.0.104:25000/gitlab/gitlab-runner:latest
+    container_name: gitlab-runner
+    restart: unless-stopped
+    network_mode: bridge
+    environment:
+      CI_SERVER_URL: "http://192.168.0.104:28080" # GitLab URL
+      # REGISTRATION_TOKEN: "glrt-cWts-7_N_0ChHmHmGLGPD286MQpwOjEKdDozCnU6eg8.01.17196021x" # 从 GitLab 获取的 Runner 注册 token
+      REGISTRATION_TOKEN: "glrt-MmPSxcLMtlGnZSDLQyzuSW86MQp0OjEKdToxCw.01.120s43171" # 从 GitLab 获取的 Runner 注册 token
+      RUNNER_DESCRIPTION: "docker-runner" # Runner 描述
+      RUNNER_TAG_LIST: "docker,ci" # Runner 标签
+      RUNNER_EXECUTOR: "docker" # 执行器类型
+      DOCKER_IMAGE: "192.168.0.104:25000/almalinux:minimal" # Docker executor 默认镜像
+      DOCKER_RUNNER_HELPER_IMAGE: "192.168.0.104:25000/gitlab/gitlab-runner-helper:x86_64-v18.6.6" # 使用本地 helper 镜像
+      REGISTER_NON_INTERACTIVE: "true" # 自动注册后直接启动
+    volumes:
+      - /srv/gitlab-runner/config:/etc/gitlab-runner
+      - /var/run/docker.sock:/var/run/docker.sock
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
