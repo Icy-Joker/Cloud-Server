@@ -1,0 +1,23 @@
+networks:
+  gitlab-net:
+    driver: bridge
+
+services:
+    image: 192.168.0.104:5000/gitlab/gitlab-ce:19.3.1-ce.0
+    container_name: gitlab-ce
+    hostname: gitlab-ce
+
+    restart: unless-stopped
+
+    volumes:
+      - /srv/gitlab-ce/etc/gitlab/gitlab.rb:/etc/gitlab/gitlab.rb
+      - /srv/gitlab-ce/etc/gitlab/config:/etc/gitlab/config
+      - /srv/gitlab-ce/logs:/var/log/gitlab
+      - /srv/gitlab-ce/data:/var/opt/gitlab
+
+    networks:
+      - gitlab-net
+    ports:
+      - "28080:80"
+      - "28022:22"
+      - "28081:5000"
