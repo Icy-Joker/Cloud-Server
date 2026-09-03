@@ -1,0 +1,98 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  generation: 1
+  labels:
+    app: samba
+  name: samba
+  namespace: default
+spec:
+  progressDeadlineSeconds: 60
+  replicas: 1
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app: samba
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: samba
+    spec:
+      serviceAccountName: samba
+#     hostNetwork: true
+      terminationGracePeriodSeconds: 30
+
+      tolerations:
+        - key: node-role.kubernetes.io/control-plane
+          operator: Exists
+          effect: NoSchedule
+
+      volumes:
+        - name: samba-config
+          configMap:
+            name: samba-config
+        - name: samba-pvc
+          persistentVolumeClaim:
+            claimName: samba-pvc
+
+      initContainers:
+        - name: homepage-init
+          image: 127.0.0.1:5000/library/busybox:latest
+          command:
+            - sh
+            - -c
+            - |
+              echo "Hello World!"
+
+      containers:
+        - name: samba
+          image: 127.0.0.1:5000/servercontainers/samba:latest
+          imagePullPolicy: IfNotPresent
+
+          env: 
+            - name: ACCOUNT_username
+              value: "password"
+            - name: UID_username
+              value: "1000"
+            - name: GROUPS_username
+              value: "users"
+            - name: GROUP_users
+              value: "1000"
+
+          command: ["tail", "-f", "/dev/null"]
+
+          ports:
+            - name: smb
+              containerPort: 445
+
+          volumeMounts:
+            - name: samba-config
+              mountPath: /etc/samba/smb.conf
+              subPath: smb.conf
+              readOnly: true
+            - name: samba-pvc
+              mountPath: /shares
+#             subPath: 
+#             readOnly: true
+          
+          resources:
+            requests:
+              cpu: 500m
+              memory: 512Mi
+            limits:
+              cpu: 4
+              memory: 1Gi
+
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+
+#     securityContext:
+#       runAsUser: 1000
+#       runAsGroup: 1000
+#       fsGroup: 1000

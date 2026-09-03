@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: samba-config
+  namespace: default
+  labels:
+    app.kubernetes.io/name: samba
+data:
+# config.yaml: |
+  smb.conf: |
+    [global]
+        workgroup = WORKGROUP
+        security = user
+        server min protocol = SMB2
+
+    [public]
+        path = /shares/public
+        browseable = yes
+        read only = no
+        guest ok = yes
+
+    [software]
+        path = /shares/software
+        browseable = yes
+        read only = yes
+        guest ok = no
